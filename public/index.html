@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Student Management System</h1>
+            <p class="subtitle">Manage Students, Classes, and Enrollments</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="students">Students</button>
+            <button class="tab-btn" data-tab="degrees">Degrees</button>
+            <button class="tab-btn" data-tab="teachers">Teachers</button>
+            <button class="tab-btn" data-tab="courses">Courses</button>
+            <button class="tab-btn" data-tab="sections">Sections</button>
+            <button class="tab-btn" data-tab="classes">Classes</button>
+            <button class="tab-btn" data-tab="enrollments">Enrollments</button>
+            <button class="tab-btn" data-tab="reports">Reports</button>
+        </nav>
+
+        <!-- Students Tab -->
+        <div id="students" class="tab-content active">
+            <h2>Student Management</h2>
+            
+            <div class="form-section">
+                <h3 id="student-form-title">Add New Student</h3>
+                <form id="studentForm">
+                    <input type="hidden" id="student_id">
+                    <div class="form-group">
+                        <label for="student_fname">First Name:</label>
+                        <input type="text" id="student_fname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="student_lname">Last Name:</label>
+                        <input type="text" id="student_lname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="degree_id">Degree:</label>
+                        <select id="degree_id" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="section_id">Section:</label>
+                        <select id="section_id">
+                            <option value="">Select Section</option>
+                        </select>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Student</button>
+                        <button type="button" class="btn btn-secondary" id="cancelStudentBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <div class="search-bar">
+                    <input type="text" id="studentSearch" placeholder="Search students...">
+                    <button class="btn btn-search" onclick="searchStudents()">🔍 Search</button>
+                    <button class="btn btn-secondary" onclick="loadStudents()">Show All</button>
+                </div>
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Degree</th>
+                            <th>Section</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Degrees Tab -->
+        <div id="degrees" class="tab-content">
+            <h2>Degree Management</h2>
+            
+            <div class="form-section">
+                <h3 id="degree-form-title">Add New Degree</h3>
+                <form id="degreeForm">
+                    <input type="hidden" id="degree_id_form">
+                    <div class="form-group">
+                        <label for="degree_desc">Degree Description:</label>
+                        <input type="text" id="degree_desc" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Degree</button>
+                        <button type="button" class="btn btn-secondary" id="cancelDegreeBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <table id="degreesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Degree Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Teachers Tab -->
+        <div id="teachers" class="tab-content">
+            <h2>Teacher Management</h2>
+            
+            <div class="form-section">
+                <h3 id="teacher-form-title">Add New Teacher</h3>
+                <form id="teacherForm">
+                    <input type="hidden" id="teacher_id_form">
+                    <div class="form-group">
+                        <label for="teacher_fname">First Name:</label>
+                        <input type="text" id="teacher_fname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher_lname">Last Name:</label>
+                        <input type="text" id="teacher_lname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher_section_id">Section:</label>
+                        <select id="teacher_section_id">
+                            <option value="">Select Section</option>
+                        </select>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Teacher</button>
+                        <button type="button" class="btn btn-secondary" id="cancelTeacherBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <table id="teachersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Section</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Courses Tab -->
+        <div id="courses" class="tab-content">
+            <h2>Course Management</h2>
+            
+            <div class="form-section">
+                <h3 id="course-form-title">Add New Course</h3>
+                <form id="courseForm">
+                    <input type="hidden" id="course_id_form">
+                    <div class="form-group">
+                        <label for="course_desc_field">Course Description:</label>
+                        <input type="text" id="course_desc_field" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Course</button>
+                        <button type="button" class="btn btn-secondary" id="cancelCourseBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <table id="coursesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sections Tab -->
+        <div id="sections" class="tab-content">
+            <h2>Section Management</h2>
+            
+            <div class="form-section">
+                <h3 id="section-form-title">Add New Section</h3>
+                <form id="sectionForm">
+                    <input type="hidden" id="section_id_form">
+                    <div class="form-group">
+                        <label for="section_name">Section Name:</label>
+                        <input type="text" id="section_name" required>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Section</button>
+                        <button type="button" class="btn btn-secondary" id="cancelSectionBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <table id="sectionsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Section Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Classes Tab -->
+        <div id="classes" class="tab-content">
+            <h2>Class Management</h2>
+            
+            <div class="form-section">
+                <h3 id="class-form-title">Add New Class</h3>
+                <form id="classForm">
+                    <input type="hidden" id="class_id_form">
+                    <div class="form-group">
+                        <label for="class_description">Class Description:</label>
+                        <input type="text" id="class_description" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="course_id_class">Course:</label>
+                        <select id="course_id_class" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="section_id_class">Section:</label>
+                        <select id="section_id_class" required>
+                            <option value="">Select Section</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher_id_class">Teacher:</label>
+                        <select id="teacher_id_class" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="semester">Semester:</label>
+                        <input type="text" id="semester" placeholder="e.g., Fall, Spring">
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year:</label>
+                        <input type="number" id="year" value="2026">
+                    </div>
+                    <div class="form-group">
+                        <label for="room_number">Room Number:</label>
+                        <input type="text" id="room_number">
+                    </div>
+                    <div class="form-group">
+                        <label for="schedule">Schedule:</label>
+                        <input type="text" id="schedule" placeholder="e.g., MWF 9:00-10:00">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Class</button>
+                        <button type="button" class="btn btn-secondary" id="cancelClassBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <table id="classesTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Description</th>
+                            <th>Course</th>
+                            <th>Section</th>
+                            <th>Teacher</th>
+                            <th>Semester</th>
+                            <th>Year</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Enrollments Tab -->
+        <div id="enrollments" class="tab-content">
+            <h2>Enrollment Management</h2>
+            
+            <div class="form-section">
+                <h3 id="enrollment-form-title">Add New Enrollment</h3>
+                <form id="enrollmentForm">
+                    <input type="hidden" id="enrollment_id_form">
+                    <div class="form-group">
+                        <label for="student_id_enroll">Student:</label>
+                        <select id="student_id_enroll" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="class_id_enroll">Class:</label>
+                        <select id="class_id_enroll" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="enrollment_date">Enrollment Date:</label>
+                        <input type="date" id="enrollment_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="grade">Grade:</label>
+                        <input type="text" id="grade" placeholder="e.g., A, B+, C">
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status">
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                            <option value="dropped">Dropped</option>
+                            <option value="withdrawn">Withdrawn</option>
+                        </select>
+                    </div>
+                    <div class="form-buttons">
+                        <button type="submit" class="btn btn-primary">Save Enrollment</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEnrollmentBtn">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-section">
+                <table id="enrollmentsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Course</th>
+                            <th>Date</th>
+                            <th>Grade</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <h2>Enrollment Report</h2>
+            
+            <div class="report-controls">
+                <button class="btn btn-primary" onclick="loadEnrollmentReport()">🔄 Refresh Report</button>
+                <button class="btn btn-secondary" onclick="exportReport()">📥 Export to CSV</button>
+            </div>
+
+            <div class="table-section">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th>ClassID</th>
+                            <th>Class Description</th>
+                            <th>StudentID</th>
+                            <th>Student First Name</th>
+                            <th>Student Last Name</th>
+                            <th>DegreeID</th>
+                            <th>Degree Desc</th>
+                            <th>Class Section</th>
+                            <th>TeacherID</th>
+                            <th>Teacher First Name</th>
+                            <th>Teacher Last Name</th>
+                            <th>CourseID</th>
+                            <th>Course Desc</th>
+                            <th>Grade</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+    </div>
+
+    <script src="js/app.js?v=8"></script>
+</body>
+</html>

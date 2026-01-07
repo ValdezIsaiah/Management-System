@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sections</title>
+</head>
+<body>
+    <h1>Section Dropdown Test</h1>
+    
+    <h2>Student Section:</h2>
+    <select id="section_id">
+        <option value="">Loading...</option>
+    </select>
+    
+    <h2>Teacher Section:</h2>
+    <select id="teacher_section_id">
+        <option value="">Loading...</option>
+    </select>
+    
+    <h2>Console Output:</h2>
+    <div id="output"></div>
+    
+    <script>
+        const API_BASE = '/api';
+        const output = document.getElementById('output');
+        
+        async function loadSectionOptions() {
+            try {
+                output.innerHTML += '<p>Fetching sections from API...</p>';
+                const response = await fetch(`${API_BASE}/sections`);
+                output.innerHTML += `<p>Response status: ${response.status}</p>`;
+                
+                if (!response.ok) {
+                    output.innerHTML += '<p style="color:red">Sections not available!</p>';
+                    return;
+                }
+                
+                const sections = await response.json();
+                output.innerHTML += `<p>Sections loaded: ${sections.length} items</p>`;
+                output.innerHTML += `<pre>${JSON.stringify(sections, null, 2)}</pre>`;
+                
+                // Populate student section dropdown
+                const select = document.getElementById('section_id');
+                output.innerHTML += `<p>Student dropdown found: ${select ? 'YES' : 'NO'}</p>`;
+                if (select) {
+                    select.innerHTML = '<option value="">Select Section</option>';
+                    sections.forEach(section => {
+                        select.innerHTML += `<option value="${section.section_id}">${section.section_name}</option>`;
+                    });
+                    output.innerHTML += `<p style="color:green">Student dropdown populated with ${sections.length} options</p>`;
+                }
+                
+                // Populate teacher section dropdown
+                const teacherSelect = document.getElementById('teacher_section_id');
+                output.innerHTML += `<p>Teacher dropdown found: ${teacherSelect ? 'YES' : 'NO'}</p>`;
+                if (teacherSelect) {
+                    teacherSelect.innerHTML = '<option value="">Select Section</option>';
+                    sections.forEach(section => {
+                        teacherSelect.innerHTML += `<option value="${section.section_id}">${section.section_name}</option>`;
+                    });
+                    output.innerHTML += `<p style="color:green">Teacher dropdown populated with ${sections.length} options</p>`;
+                }
+            } catch (error) {
+                output.innerHTML += `<p style="color:red">Error: ${error.message}</p>`;
+                console.error('Error loading section options:', error);
+            }
+        }
+        
+        // Load sections when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            output.innerHTML += '<p>Page loaded, starting section load...</p>';
+            loadSectionOptions();
+        });
+    </script>
+</body>
+</html>
