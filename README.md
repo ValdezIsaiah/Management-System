@@ -6,21 +6,21 @@ A comprehensive web-based Student Management System built with Node.js, Express,
 
 - **Student Management**: Add, edit, delete, and search students
 - **Degree Management**: Manage academic degrees
-- **Teacher Management**: Manage teaching staff
-- **Course Management**: Manage courses with codes and credits
-- **Section Management**: Manage class sections
+- **Teacher Management**: Manage teaching staff with section assignments
+- **Course Management**: Manage courses
+- **Section Management**: Manage class sections (1A, 1B, 1C, etc.)
 - **Class Management**: Create and manage classes with courses, sections, and teachers
 - **Enrollment Management**: Enroll students in classes and track grades
-- **Comprehensive Reports**: Generate enrollment reports matching the required format
+- **Comprehensive Reports**: Generate enrollment reports
 
 ## Database Design
 
 The system uses a normalized database structure (3NF) with the following entities:
 
 1. **Degrees** - Academic degree programs
-2. **Students** - Student information linked to degrees
-3. **Teachers** - Teaching staff information
-4. **Courses** - Course details with codes and credits
+2. **Students** - Student information linked to degrees and sections
+3. **Teachers** - Teaching staff information with section assignments
+4. **Courses** - Course details
 5. **Sections** - Class section designations
 6. **Classes** - Class instances linking courses, sections, and teachers
 7. **Enrollments** - Student enrollment in classes (many-to-many relationship)
@@ -63,7 +63,7 @@ DB_USER=root
 DB_PASSWORD=
 DB_NAME=student_management_db
 DB_PORT=3306
-PORT=3000
+PORT=3001
 ```
 
 **Note**: If your MySQL has a password, update `DB_PASSWORD` in the `.env` file.
@@ -94,13 +94,13 @@ For production:
 npm start
 ```
 
-The server will start on http://localhost:3000
+The server will start on http://localhost:3001
 
 ### 6. Access the Application
 
 Open your browser and navigate to:
 ```
-http://localhost:3000
+http://localhost:3001
 ```
 
 ## Project Structure
@@ -220,7 +220,7 @@ student-management-system/
 
 ### Adding a Student
 1. Click the **Students** tab
-2. Fill in the student form (First Name, Last Name, Degree, Email, Phone)
+2. Fill in the student form (First Name, Last Name, Degree, Section)
 3. Click **Save Student**
 
 ### Creating a Class
@@ -249,7 +249,7 @@ student-management-system/
 - Verify database exists in phpMyAdmin
 
 ### Port Already in Use
-- Change `PORT=3000` in `.env` to another port (e.g., `PORT=3001`)
+- Change `PORT=3001` in `.env` to another port (e.g., `PORT=3002`)
 - Restart the server
 
 ### Cannot Find Module Error
@@ -259,10 +259,10 @@ student-management-system/
 
 The system includes sample data:
 - 5 Degrees
+- 12 Sections (1A-4C)
 - 8 Students
 - 5 Teachers
 - 8 Courses
-- 5 Sections
 - 8 Classes
 - 14 Enrollments
 
