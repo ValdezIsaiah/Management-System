@@ -50,7 +50,7 @@ exports.deleteTeacher = async (req, res) => {
         if (affectedRows === 0) {
             return res.status(404).json({ error: 'Teacher not found' });
         }
-        res.json({ message: 'Teacher deleted successfully' });
+        res.json({ message: 'Teacher status set to inactive successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -59,6 +59,28 @@ exports.deleteTeacher = async (req, res) => {
 exports.searchTeachers = async (req, res) => {
     try {
         const teachers = await Teacher.search(req.query.q || '');
+        res.json(teachers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.reactivateTeacher = async (req, res) => {
+    try {
+        const affectedRows = await Teacher.reactivate(req.params.id);
+        if (affectedRows === 0) {
+            return res.status(404).json({ error: 'Teacher not found' });
+        }
+        const reactivatedTeacher = await Teacher.getById(req.params.id);
+        res.json({ message: 'Teacher reactivated successfully', teacher: reactivatedTeacher });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.getAllTeachersIncludingInactive = async (req, res) => {
+    try {
+        const teachers = await Teacher.getAllIncludingInactive();
         res.json(teachers);
     } catch (error) {
         res.status(500).json({ error: error.message });

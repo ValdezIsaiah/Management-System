@@ -4,8 +4,8 @@ const API_BASE = '/api';
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeTabs();
-    loadDegreeOptions(); // Load degree dropdown options first
-    loadSectionOptions(); // Load section dropdown options
+    loadDegreeOptions();
+    loadSectionOptions();
     loadStudents();
     loadDegrees();
     setDefaultDate();
@@ -78,6 +78,7 @@ function setupFormHandlers() {
     // Teacher Form
     document.getElementById('teacherForm').addEventListener('submit', handleTeacherSubmit);
     document.getElementById('cancelTeacherBtn').addEventListener('click', resetTeacherForm);
+    document.getElementById('toggleInactiveTeachersBtn').addEventListener('click', toggleInactiveTeachers);
     
     // Course Form
     document.getElementById('courseForm').addEventListener('submit', handleCourseSubmit);
@@ -165,58 +166,34 @@ async function loadDegreeOptions() {
 
 async function loadSectionOptions() {
     try {
-        console.log('=== loadSectionOptions called ===');
         const response = await fetch(`${API_BASE}/sections`);
-        console.log('Section API response:', response.status);
-        if (!response.ok) {
-            console.warn('Sections not available yet');
-            return;
-        }
         const sections = await response.json();
-        console.log('Sections loaded:', sections);
         
-        // Populate student section dropdown
+        // Student section dropdown
         const select = document.getElementById('section_id');
-        console.log('Student section dropdown element:', select);
         if (select) {
             select.innerHTML = '<option value="">Select Section</option>';
             sections.forEach(section => {
-                const option = document.createElement('option');
-                option.value = section.section_id;
-                option.textContent = section.section_name;
-                select.appendChild(option);
+                select.innerHTML += `<option value="${section.section_id}">${section.section_name}</option>`;
             });
-            console.log('Student section dropdown now has', select.options.length, 'options');
-        } else {
-            console.error('Section dropdown with id="section_id" not found!');
         }
         
-        // Populate teacher section dropdown
+        // Teacher section dropdown
         const teacherSelect = document.getElementById('teacher_section_id');
-        console.log('Teacher section dropdown element:', teacherSelect);
         if (teacherSelect) {
             teacherSelect.innerHTML = '<option value="">Select Section</option>';
             sections.forEach(section => {
-                const option = document.createElement('option');
-                option.value = section.section_id;
-                option.textContent = section.section_name;
-                teacherSelect.appendChild(option);
+                teacherSelect.innerHTML += `<option value="${section.section_id}">${section.section_name}</option>`;
             });
-            console.log('Teacher section dropdown now has', teacherSelect.options.length, 'options');
         }
         
-        // Populate class section dropdown
+        // Class section dropdown
         const classSelect = document.getElementById('section_id_class');
-        console.log('Class section dropdown element:', classSelect);
         if (classSelect) {
             classSelect.innerHTML = '<option value="">Select Section</option>';
             sections.forEach(section => {
-                const option = document.createElement('option');
-                option.value = section.section_id;
-                option.textContent = section.section_name;
-                classSelect.appendChild(option);
+                classSelect.innerHTML += `<option value="${section.section_id}">${section.section_name}</option>`;
             });
-            console.log('Class section dropdown now has', classSelect.options.length, 'options');
         }
     } catch (error) {
         console.error('Error loading section options:', error);
@@ -414,11 +391,15 @@ function resetDegreeForm() {
 
 // ============= TEACHERS =============
 
-async function loadTeachers() {
+// Track whether showing inactive teachers
+let showingInactiveTeachers = false;
+
+async function loadTeachers(includeInactive = false) {
     try {
-        const response = await fetch(`${API_BASE}/teachers`);
+        const endpoint = includeInactive ? `${API_BASE}/teachers/all/including-inactive` : `${API_BASE}/teachers`;
+        const response = await fetch(endpoint);
         const teachers = await response.json();
-        displayTeachers(teachers);
+        displayTeachers(teachers, includeInactive);
         loadTeacherOptions();
         loadSectionOptions(); // Load section options for teacher form
     } catch (error) {
@@ -426,21 +407,31 @@ async function loadTeachers() {
     }
 }
 
-function displayTeachers(teachers) {
+function displayTeachers(teachers, showingInactive = false) {
     const tbody = document.querySelector('#teachersTable tbody');
     tbody.innerHTML = '';
     
     teachers.forEach(teacher => {
+        const isActive = teacher.status === 'active';
+        const statusBadge = isActive ? 
+            '<span style="color: green; font-weight: bold;">Active</span>' : 
+            '<span style="color: red; font-weight: bold;">Inactive</span>';
+        
+        const actionButtons = isActive ? `
+            <button class="btn btn-warning" onclick="editTeacher(${teacher.teacher_id})">Edit</button>
+            <button class="btn btn-danger" onclick="deleteTeacher(${teacher.teacher_id})">Delete</button>
+        ` : `
+            <button class="btn btn-success" onclick="reactivateTeacher(${teacher.teacher_id})">Reactivate</button>
+        `;
+        
         const row = `
-            <tr>
+            <tr style="${isActive ? '' : 'background-color: #f0f0f0; opacity: 0.7;'}">
                 <td>${teacher.teacher_id}</td>
                 <td>${teacher.teacherfname}</td>
                 <td>${teacher.teacherlname}</td>
                 <td>${teacher.section_name || 'N/A'}</td>
-                <td>
-                    <button class="btn btn-warning" onclick="editTeacher(${teacher.teacher_id})">Edit</button>
-                    <button class="btn btn-danger" onclick="deleteTeacher(${teacher.teacher_id})">Delete</button>
-                </td>
+                <td>${statusBadge}</td>
+                <td>${actionButtons}</td>
             </tr>
         `;
         tbody.innerHTML += row;
@@ -454,7 +445,7 @@ async function loadTeacherOptions() {
         const select = document.getElementById('teacher_id_class');
         select.innerHTML = '<option value="">Select Teacher</option>';
         teachers.forEach(teacher => {
-            select.innerHTML += `<option value="${teacher.teacher_id}">${teacher.teacher_fname} ${teacher.teacher_lname}</option>`;
+            select.innerHTML += `<option value="${teacher.teacher_id}">${teacher.teacherfname} ${teacher.teacherlname}</option>`;
         });
     } catch (error) {
         console.error('Error loading teacher options:', error);
@@ -510,14 +501,39 @@ async function editTeacher(id) {
 }
 
 async function deleteTeacher(id) {
-    if (!confirm('Are you sure you want to delete this teacher?')) return;
+    if (!confirm('Are you sure you want to set this teacher as inactive? They will be hidden from the table but can be reactivated later.')) return;
     
     try {
         const response = await fetch(`${API_BASE}/teachers/${id}`, { method: 'DELETE' });
         
         if (response.ok) {
-            showMessage('Teacher deleted successfully!');
-            loadTeachers();
+            showMessage('Teacher set to inactive successfully!');
+            loadTeachers(showingInactiveTeachers);
+        } else {
+            const error = await response.json();
+            showMessage('Error: ' + error.error, 'error');
+        }
+    } catch (error) {
+        showMessage('Error: ' + error.message, 'error');
+    }
+}
+
+function toggleInactiveTeachers() {
+    showingInactiveTeachers = !showingInactiveTeachers;
+    const btn = document.getElementById('toggleInactiveTeachersBtn');
+    btn.textContent = showingInactiveTeachers ? 'Show Active Only' : 'Show Inactive Teachers';
+    loadTeachers(showingInactiveTeachers);
+}
+
+async function reactivateTeacher(id) {
+    if (!confirm('Are you sure you want to reactivate this teacher?')) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/teachers/${id}/reactivate`, { method: 'PUT' });
+        
+        if (response.ok) {
+            showMessage('Teacher reactivated successfully!');
+            loadTeachers(showingInactiveTeachers);
         } else {
             const error = await response.json();
             showMessage('Error: ' + error.error, 'error');
@@ -679,20 +695,6 @@ function displaySections(sections) {
     });
 }
 
-async function loadSectionOptions() {
-    try {
-        const response = await fetch(`${API_BASE}/sections`);
-        const sections = await response.json();
-        const select = document.getElementById('section_id_class');
-        select.innerHTML = '<option value="">Select Section</option>';
-        sections.forEach(section => {
-            select.innerHTML += `<option value="${section.section_id}">${section.section_name}</option>`;
-        });
-    } catch (error) {
-        console.error('Error loading section options:', error);
-    }
-}
-
 async function handleSectionSubmit(e) {
     e.preventDefault();
     
@@ -784,12 +786,10 @@ function displayClasses(classes) {
         const row = `
             <tr>
                 <td>${classItem.class_id}</td>
-                <td>${classItem.class_description}</td>
-                <td>${classItem.course_code || 'N/A'}</td>
+                <td>${classItem.class_desc}</td>
+                <td>${classItem.course_desc || 'N/A'}</td>
                 <td>${classItem.section_name || 'N/A'}</td>
                 <td>${classItem.teacher_name || 'N/A'}</td>
-                <td>${classItem.semester || 'N/A'}</td>
-                <td>${classItem.year || 'N/A'}</td>
                 <td>
                     <button class="btn btn-warning" onclick="editClass(${classItem.class_id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteClass(${classItem.class_id})">Delete</button>
@@ -808,11 +808,7 @@ async function handleClassSubmit(e) {
         class_description: document.getElementById('class_description').value,
         course_id: document.getElementById('course_id_class').value,
         section_id: document.getElementById('section_id_class').value,
-        teacher_id: document.getElementById('teacher_id_class').value,
-        semester: document.getElementById('semester').value,
-        year: document.getElementById('year').value,
-        room_number: document.getElementById('room_number').value,
-        schedule: document.getElementById('schedule').value
+        teacher_id: document.getElementById('teacher_id_class').value
     };
     
     try {
@@ -844,14 +840,10 @@ async function editClass(id) {
         const classItem = await response.json();
         
         document.getElementById('class_id_form').value = classItem.class_id;
-        document.getElementById('class_description').value = classItem.class_description;
+        document.getElementById('class_description').value = classItem.class_desc;
         document.getElementById('course_id_class').value = classItem.course_id;
         document.getElementById('section_id_class').value = classItem.section_id;
         document.getElementById('teacher_id_class').value = classItem.teacher_id;
-        document.getElementById('semester').value = classItem.semester || '';
-        document.getElementById('year').value = classItem.year || '';
-        document.getElementById('room_number').value = classItem.room_number || '';
-        document.getElementById('schedule').value = classItem.schedule || '';
         document.getElementById('class-form-title').textContent = 'Edit Class';
     } catch (error) {
         showMessage('Error loading class: ' + error.message, 'error');
@@ -1044,21 +1036,19 @@ function displayReport(report) {
     report.forEach(row => {
         const tr = `
             <tr>
-                <td>${row.ClassID}</td>
-                <td>${row.ClassDescription}</td>
-                <td>${row.StudentID}</td>
-                <td>${row.StudentFName}</td>
-                <td>${row.StudentLName}</td>
-                <td>${row.DegreeID}</td>
-                <td>${row.DegreeDesc}</td>
-                <td>${row.ClassSection}</td>
-                <td>${row.TeacherID}</td>
-                <td>${row.TeacherFName}</td>
-                <td>${row.TeacherLName}</td>
-                <td>${row.CourseID}</td>
-                <td>${row.CourseDesc}</td>
-                <td>${row.Grade || 'N/A'}</td>
-                <td>${row.Status}</td>
+                <td>${row.ClassID || 'N/A'}</td>
+                <td>${row.ClassDescription || 'N/A'}</td>
+                <td>${row.StudentID || 'N/A'}</td>
+                <td>${row.StudentFName || 'N/A'}</td>
+                <td>${row.StudentLName || 'N/A'}</td>
+                <td>${row.DegreeID || 'N/A'}</td>
+                <td>${row.DegreeDesc || 'N/A'}</td>
+                <td>${row.ClassSection || 'N/A'}</td>
+                <td>${row.TeacherID || 'N/A'}</td>
+                <td>${row.TeacherFName || 'N/A'}</td>
+                <td>${row.TeacherLName || 'N/A'}</td>
+                <td>${row.CourseID || 'N/A'}</td>
+                <td>${row.CourseDesc || 'N/A'}</td>
             </tr>
         `;
         tbody.innerHTML += tr;

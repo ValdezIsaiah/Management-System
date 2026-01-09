@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Sections API</title>
+</head>
+<body>
+    <h1>Testing Sections API</h1>
+    <button onclick="testAPI()">Test /api/sections</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Loading...';
+            
+            try {
+                console.log('Fetching from /api/sections');
+                const response = await fetch('/api/sections');
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    resultDiv.textContent = `Error ${response.status}: ${errorText}`;
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('Data received:', data);
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.textContent = `Exception: ${error.message}`;
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

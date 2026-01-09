@@ -40,7 +40,7 @@ INSERT INTO courses (course_code, course_desc, credits) VALUES
 ('CS401', 'Advanced Programming', 4);
 
 -- Insert Sections
-INSERT INTO sections (section_name) VALUES
+INSERT INTO section (section_name) VALUES
 ('Section A'),
 ('Section B'),
 ('Section C'),

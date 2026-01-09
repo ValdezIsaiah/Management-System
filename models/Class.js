@@ -32,19 +32,41 @@ class Class {
     }
 
     static async create(classData) {
-        const { class_description, course_id, section_id } = classData;
+        const { class_description, course_id, section_id, teacher_id } = classData;
+        
+        // Check for duplicate class: same course, section, and teacher
+        const [existing] = await pool.query(
+            'SELECT class_id FROM class WHERE course_id = ? AND section_id = ? AND teacher_id = ?',
+            [course_id, section_id || null, teacher_id || null]
+        );
+        
+        if (existing.length > 0) {
+            throw new Error('A class with the same course, section, and teacher already exists');
+        }
+        
         const [result] = await pool.query(
-            'INSERT INTO class (class_desc, course_id, section_id) VALUES (?, ?, ?)',
-            [class_description, course_id, section_id || null]
+            'INSERT INTO class (class_desc, course_id, section_id, teacher_id) VALUES (?, ?, ?, ?)',
+            [class_description, course_id, section_id || null, teacher_id || null]
         );
         return result.insertId;
     }
 
     static async update(id, classData) {
-        const { class_description, course_id, section_id } = classData;
+        const { class_description, course_id, section_id, teacher_id } = classData;
+        
+        // Check for duplicate class: same course, section, and teacher (excluding current class)
+        const [existing] = await pool.query(
+            'SELECT class_id FROM class WHERE course_id = ? AND section_id = ? AND teacher_id = ? AND class_id != ?',
+            [course_id, section_id || null, teacher_id || null, id]
+        );
+        
+        if (existing.length > 0) {
+            throw new Error('A class with the same course, section, and teacher already exists');
+        }
+        
         const [result] = await pool.query(
-            'UPDATE class SET class_desc = ?, course_id = ?, section_id = ? WHERE class_id = ?',
-            [class_description, course_id, section_id || null, id]
+            'UPDATE class SET class_desc = ?, course_id = ?, section_id = ?, teacher_id = ? WHERE class_id = ?',
+            [class_description, course_id, section_id || null, teacher_id || null, id]
         );
         return result.affectedRows;
     }

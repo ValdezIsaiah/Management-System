@@ -10,7 +10,7 @@
     <div class="container">
         <header>
             <h1>📚 Student Management System</h1>
-            <p class="subtitle">Manage Students, Classes, and Enrollments</p>
+            <p class="subtitle">Manage Students, Classes, and Reports</p>
         </header>
 
         <nav class="nav-tabs">
@@ -20,7 +20,6 @@
             <button class="tab-btn" data-tab="courses">Courses</button>
             <button class="tab-btn" data-tab="sections">Sections</button>
             <button class="tab-btn" data-tab="classes">Classes</button>
-            <button class="tab-btn" data-tab="enrollments">Enrollments</button>
             <button class="tab-btn" data-tab="reports">Reports</button>
         </nav>
 
@@ -141,6 +140,10 @@
                 </form>
             </div>
 
+            <div class="table-controls">
+                <button type="button" class="btn btn-secondary" id="toggleInactiveTeachersBtn">Show Inactive Teachers</button>
+            </div>
+
             <div class="table-section">
                 <table id="teachersTable">
                     <thead>
@@ -149,6 +152,7 @@
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Section</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -249,22 +253,6 @@
                         <label for="teacher_id_class">Teacher:</label>
                         <select id="teacher_id_class" required></select>
                     </div>
-                    <div class="form-group">
-                        <label for="semester">Semester:</label>
-                        <input type="text" id="semester" placeholder="e.g., Fall, Spring">
-                    </div>
-                    <div class="form-group">
-                        <label for="year">Year:</label>
-                        <input type="number" id="year" value="2026">
-                    </div>
-                    <div class="form-group">
-                        <label for="room_number">Room Number:</label>
-                        <input type="text" id="room_number">
-                    </div>
-                    <div class="form-group">
-                        <label for="schedule">Schedule:</label>
-                        <input type="text" id="schedule" placeholder="e.g., MWF 9:00-10:00">
-                    </div>
                     <div class="form-buttons">
                         <button type="submit" class="btn btn-primary">Save Class</button>
                         <button type="button" class="btn btn-secondary" id="cancelClassBtn">Cancel</button>
@@ -272,8 +260,7 @@
                 </form>
             </div>
 
-            <div class="table-section">
-                <table id="classesTable">
+            <div class="table-section">\n                <table id="classesTable">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -281,8 +268,6 @@
                             <th>Course</th>
                             <th>Section</th>
                             <th>Teacher</th>
-                            <th>Semester</th>
-                            <th>Year</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -363,21 +348,19 @@
                 <table id="reportTable">
                     <thead>
                         <tr>
-                            <th>ClassID</th>
+                            <th>Class ID</th>
                             <th>Class Description</th>
-                            <th>StudentID</th>
+                            <th>Student ID</th>
                             <th>Student First Name</th>
                             <th>Student Last Name</th>
-                            <th>DegreeID</th>
+                            <th>Degree ID</th>
                             <th>Degree Desc</th>
                             <th>Class Section</th>
-                            <th>TeacherID</th>
+                            <th>Teacher ID</th>
                             <th>Teacher First Name</th>
                             <th>Teacher Last Name</th>
-                            <th>CourseID</th>
+                            <th>Course ID</th>
                             <th>Course Desc</th>
-                            <th>Grade</th>
-                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

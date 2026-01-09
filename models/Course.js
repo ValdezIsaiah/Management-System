@@ -13,6 +13,17 @@ class Course {
 
     static async create(courseData) {
         const { course_code, course_desc } = courseData;
+        
+        // Check for duplicate course description
+        const [existing] = await pool.query(
+            'SELECT course_id FROM course WHERE course_desc = ?',
+            [course_desc]
+        );
+        
+        if (existing.length > 0) {
+            throw new Error('A course with this description already exists');
+        }
+        
         const [result] = await pool.query(
             'INSERT INTO course (course_desc) VALUES (?)',
             [course_desc]
@@ -22,6 +33,17 @@ class Course {
 
     static async update(id, courseData) {
         const { course_code, course_desc } = courseData;
+        
+        // Check for duplicate course description (excluding current course)
+        const [existing] = await pool.query(
+            'SELECT course_id FROM course WHERE course_desc = ? AND course_id != ?',
+            [course_desc, id]
+        );
+        
+        if (existing.length > 0) {
+            throw new Error('A course with this description already exists');
+        }
+        
         const [result] = await pool.query(
             'UPDATE course SET course_desc = ? WHERE course_id = ?',
             [course_desc, id]

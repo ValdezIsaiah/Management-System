@@ -12,7 +12,7 @@ class Enrollment {
             LEFT JOIN students s ON e.student_id = s.student_id
             LEFT JOIN classes c ON e.class_id = c.class_id
             LEFT JOIN courses co ON c.course_id = co.course_id
-            LEFT JOIN sections sec ON c.section_id = sec.section_id
+            LEFT JOIN section sec ON c.section_id = sec.section_id
             ORDER BY e.enrollment_id DESC
         `);
         return rows;
@@ -29,7 +29,7 @@ class Enrollment {
             LEFT JOIN students s ON e.student_id = s.student_id
             LEFT JOIN classes c ON e.class_id = c.class_id
             LEFT JOIN courses co ON c.course_id = co.course_id
-            LEFT JOIN sections sec ON c.section_id = sec.section_id
+            LEFT JOIN section sec ON c.section_id = sec.section_id
             WHERE e.enrollment_id = ?
         `, [id]);
         return rows[0];
@@ -45,7 +45,7 @@ class Enrollment {
             FROM enrollments e
             LEFT JOIN classes c ON e.class_id = c.class_id
             LEFT JOIN courses co ON c.course_id = co.course_id
-            LEFT JOIN sections sec ON c.section_id = sec.section_id
+            LEFT JOIN section sec ON c.section_id = sec.section_id
             LEFT JOIN teachers t ON c.teacher_id = t.teacher_id
             WHERE e.student_id = ?
             ORDER BY e.enrollment_date DESC
